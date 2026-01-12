@@ -1,9 +1,11 @@
-fastapi
-uvicorn[standard]
-psycopg2-binary
-sqlalchemy
-alembic
+
 
 python-dotenv
 sqlalchemy>=2.0
+
+fastapi==0.111.0
+sqlmodel==0.0.18
+alembic==1.13.1
+psycopg2-binary==2.9.9
+uvicorn[standard]==0.29.0
 asyncpg

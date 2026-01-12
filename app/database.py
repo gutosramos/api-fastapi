@@ -1,24 +1,14 @@
 import os
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import declarative_base
+from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine
 
-# Ler variáveis do .env
-DB_USER = os.getenv("DB_USER")
-DB_PASS = os.getenv("DB_PASSWORD")
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-
-print(f"Connecting to Postgres at {DB_HOST}:{DB_PORT} as {DB_USER}")  # Debug
-
-DATABASE_URL = f"postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
-engine = create_async_engine(DATABASE_URL, echo=False)
-
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    expire_on_commit=False,
-    class_=AsyncSession,
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+asyncpg://api_user:api_pass@db:5432/api_db"
 )
 
-Base = declarative_base()
+engine = create_async_engine(DATABASE_URL, echo=False, pool_pre_ping=True)
+
+async def create_db_and_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.create_all)

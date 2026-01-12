@@ -1,17 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-echo "⏳ Waiting for Postgres at $DB_HOST:$DB_PORT..."
+echo "⏳ Aguardando Postgres em ${DB_HOST:-db}:${DB_PORT:-5432}..."
+while ! nc -z ${DB_HOST:-db} ${DB_PORT:-5432}; do sleep 0.5; done
+echo "✅ Postgres respondendo"
 
-until nc -z "$DB_HOST" "$DB_PORT"; do
-  sleep 1
-done
+echo "📦 Alembic upgrade head"
+alembic -c /app/alembic.ini upgrade head
 
-echo "✅ Postgres is up"
-
-echo "📦 Running Alembic migrations..."
-cd /app
-alembic upgrade head
-
-echo "🚀 Starting FastAPI..."
-exec uvicorn app.main:app --host 0.0.0.0 --port 8000
+echo "🚀 Iniciando FastAPI"
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
