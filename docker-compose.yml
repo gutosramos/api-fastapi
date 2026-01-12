@@ -1,21 +1,31 @@
 services:
   api:
     build: .
-    ports:
-      - "8000:8000"
+    container_name: api-fastapi
+    expose:
+      - "8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://api_user:api_pass@db:5432/api_db
     depends_on:
       - db
+    networks:
+      - media-shared
 
   db:
     image: postgres:16-alpine
+    container_name: api-fastapi-db
     environment:
       POSTGRES_USER: api_user
       POSTGRES_PASSWORD: api_pass
       POSTGRES_DB: api_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - media-shared
 
 volumes:
   postgres_data:
+
+networks:
+  media-shared:
+    external: true
