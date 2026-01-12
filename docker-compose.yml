@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   api:
     build: .
@@ -15,13 +17,14 @@ services:
   db:
     image: postgres:16
     container_name: fastapi_postgres
-    env_file:
-      - .env
+    environment:
+      POSTGRES_USER: fastapi
+      POSTGRES_PASSWORD: fastapi
+      POSTGRES_DB: fastapi
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
-    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
